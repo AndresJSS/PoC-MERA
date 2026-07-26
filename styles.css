@@ -1,0 +1,373 @@
+/* ==========================================================================
+   CONFIGURACIÓN GLOBAL
+   ========================================================================== */
+body {
+    font-family: 'Roboto', sans-serif;
+    /* Un ligero ajuste al color de texto base para que no sea negro puro, 
+       mejorando el contraste y la lectura en pantalla */
+    color: #333333; 
+}
+
+/* ==========================================================================
+   PALETA DE COLORES INSTITUCIONALES IICA (Manual 2016)
+   ========================================================================== */
+:root {
+    --iica-azul: #003366;
+    --iica-verde: #006633;
+    --iica-celeste: #006699;
+    --iica-gris: #CCCCCC;
+    --iica-dorado: #CC9933;
+}
+
+/* Clases para el Azul IICA (Principal) */
+.bg-iica-azul { background-color: var(--iica-azul) !important; color: #ffffff !important; }
+.text-iica-azul { color: var(--iica-azul) !important; }
+.border-iica-azul { border-color: var(--iica-azul) !important; }
+/* Clases para el Verde IICA (Sustituto de 'success') */
+.bg-iica-verde { background-color: var(--iica-verde) !important; color: #ffffff !important; }
+.text-iica-verde { color: var(--iica-verde) !important; }
+.border-iica-verde { border-color: var(--iica-verde) !important; }
+.btn-iica-verde { 
+    background-color: var(--iica-verde); 
+    color: white; 
+    border: none; 
+}
+
+.btn-iica-verde:hover { background-color: #004d26; color: white; }
+/* Clases para el Celeste IICA (Sustituto de 'info') */
+.bg-iica-celeste { background-color: var(--iica-celeste) !important; color: #ffffff !important; }
+.text-iica-celeste { color: var(--iica-celeste) !important; }
+.border-iica-celeste { border-color: var(--iica-celeste) !important;
+}
+
+/* ==========================================================================
+   COLORES EXTRA PARA EL SEMÁFORO DE 5 NIVELES (PASO 2)
+   ========================================================================== */
+.bg-naranja { 
+    background-color: #fd7e14 !important; /* Naranja corporativo estándar */
+    color: #ffffff !important; 
+}
+
+.bg-verde-claro { 
+    background-color: #81c784 !important; /* Verde pastel visible pero legible */
+    color: #ffffff !important; 
+}
+
+/* Color para Capacidad Incipiente (Valor 2 en Excel) */
+.bg-rojo-claro {
+    background-color: #ec8887 !important; /* Rojo claro / Coral */
+    color: #ffffff !important;
+}
+
+/* ==========================================================================
+   ESTILOS DE TARJETAS (SECCIONES DEL FORMULARIO)
+   ========================================================================== */
+.tarjeta-seccion {
+    /* Mantiene el borde gris claro general */
+    border: 1px solid #e0e0e0; 
+    /* Crea la banda lateral azul IICA más gruesa */
+    border-left: 5px solid var(--iica-azul) !important; 
+    /* Suaviza un poco las esquinas */
+    border-radius: 0.5rem; 
+}
+
+/* Ajuste para que el encabezado de la tarjeta se fusione limpiamente */
+.tarjeta-seccion .card-header {
+    background-color: #ffffff;
+    border-bottom: none;
+    padding-top: 1.25rem;
+    padding-bottom: 0;
+}
+
+/* ==========================================================================
+   BOTONES INTERACTIVOS (GUÍA METODOLÓGICA)
+   ========================================================================== */
+.btn-guia-dinamico {
+    color: var(--iica-celeste);
+    border-color: var(--iica-celeste);
+    background-color: transparent;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Estado cuando el mouse pasa por encima o cuando está ACTIVO */
+.btn-guia-dinamico:hover,
+.btn-guia-dinamico.activo {
+    background-color: var(--iica-celeste);
+    color: #ffffff !important;
+    border-color: var(--iica-celeste);
+    box-shadow: 0 4px 6px rgba(0, 102, 153, 0.2);
+}
+
+/* Para ocultar los paneles de forma controlada */
+.panel-guia {
+    display: none;
+}
+.panel-guia.visible {
+    display: block;
+}
+
+/* ==========================================================================
+   TARJETAS DE TIPOLOGÍAS (PESTAÑAS PASO 1)
+   ========================================================================== */
+.tipologia-card {
+    border: 1px solid #e0e0e0 !important; /* Elimina el borde azul */
+    background-color: #f0f2f5; /* Fondo gris claro */
+    transition: all 0.2s ease-in-out;
+}
+
+/* Texto en Azul IICA por defecto */
+.tipologia-card span {
+    color: var(--iica-azul);
+    transition: color 0.2s ease-in-out;
+}
+
+/* Efecto Hover al pasar el ratón */
+.nav-link:hover:not(.active) .tipologia-card {
+    background-color: #e2e6ea; /* Gris ligeramente más oscuro */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+}
+
+/* ESTADO ACTIVO (Al seleccionar la pestaña) */
+.nav-link.active .tipologia-card {
+    background-color: var(--iica-azul) !important;
+    box-shadow: 0 4px 8px rgba(0, 51, 102, 0.3) !important;
+}
+
+/* Texto pasa a blanco en la tarjeta activa */
+.nav-link.active .tipologia-card span {
+    color: #ffffff !important; 
+}
+
+/* ==========================================================================
+   TARJETAS Y DIVISORES DE PERTURBACIONES (PASO 1)
+   ========================================================================== */
+/* Tarjeta interna con fondo gris claro idéntico a las del Paso 0 */
+.tarjeta-perturbacion {
+    background-color: #f8f9fa !important;
+    border: 1px solid #e0e0e0 !important;
+    border-radius: 0.5rem;
+}
+
+/* Líneas divisorias blancas elegantes */
+.linea-gris-bottom {
+    border-bottom: 1px solid #e0e0e0 !important;
+}
+
+/* En pantallas medianas y grandes crea el divisor vertical blanco */
+@media (min-width: 768px) {
+    .linea-gris-end {
+        border-right: 1px solid #e0e0e0 !important;
+    }
+}
+
+/* Estado completado para tarjetas de perturbación (Paso 1) */
+.tarjeta-perturbacion.tarjeta-completada {
+    background-color: #eef7ee !important; /* Verde pastel muy tenue */
+    border: 1px solid #81c784 !important; /* Borde verde de confirmación */
+}
+
+
+
+
+
+/* Estado inactivo de las tarjetas */
+.tipologia-card {
+    transition: all 0.2s ease-in-out;
+    border: 2px solid transparent;
+}
+
+/* Efecto al pasar el ratón */
+.nav-link:hover .tipologia-card {
+    background-color: #f8f9fa;
+    transform: translateY(-2px);
+}
+
+/* ESTADO ACTIVO: Cuando el usuario hace clic en la pestaña */
+.nav-pills .nav-link.active .tipologia-card {
+    background-color: #e0f7fa; /* Fondo azul claro */
+    border-color: #0dcaf0;     /* Borde color 'info' de Bootstrap */
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* GRID DE 7 COLUMNAS PERSONALIZADO */
+.grid-7-columnas {
+    display: grid;
+    gap: 10px;
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 20px;
+}
+
+/* Teléfonos móviles: 2 columnas */
+@media (max-width: 575.98px) {
+    .grid-7-columnas {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Tabletas medianas: 4 columnas */
+@media (min-width: 576px) and (max-width: 991.98px) {
+    .grid-7-columnas {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Laptops y pantallas grandes: Exactamente 7 columnas alineadas */
+@media (min-width: 992px) {
+    .grid-7-columnas {
+        grid-template-columns: repeat(7, 1fr);
+    }
+}
+
+/* Asegurar que las tarjetas de tipologías ocupen todo el alto de su contenedor grid */
+.tipologia-card {
+    min-height: 90px;
+    transition: all 0.2s ease-in-out;
+    border: 2px solid transparent;
+}
+
+/* Efecto hover sobre las tarjetas */
+.nav-link:hover .tipologia-card {
+    background-color: #f8f9fa;
+    transform: translateY(-2px);
+}
+
+/* Estado activo: cuando el usuario selecciona la tipología */
+.nav-pills .nav-link.active .tipologia-card {
+    background-color: #e0f7fa; /* Celeste claro institucional */
+    border-color: #0dcaf0;     /* Borde color 'info' de Bootstrap */
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ==========================================================================
+   NAVEGACIÓN Y BOTONES DE DESPLAZAMIENTO
+   ========================================================================== */
+/* Desplazamiento suave para toda la página */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Botón circular para volver al título */
+.btn-subir {
+    background-color: #f0f2f5;
+    color: var(--iica-azul);
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+}
+
+.btn-subir:hover {
+    background-color: var(--iica-azul);
+    color: #ffffff;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 10px rgba(0, 51, 102, 0.3);
+}
+
+/* ==========================================================================
+   NIVELES DE RIESGO IRP (PASO 1)
+   ========================================================================== */
+.bg-riesgo-muy-bajo {
+    background-color: #81c784 !important; /* Verde claro */
+    color: #ffffff !important;
+}
+
+.bg-riesgo-bajo {
+    background-color: #2e7d32 !important; /* Verde oscuro / IICA */
+    color: #ffffff !important;
+}
+
+.bg-riesgo-medio {
+    background-color: #ffc107 !important; /* Amarillo */
+    color: #ffffff !important;
+}
+
+.bg-riesgo-alto {
+    background-color: #dc3545 !important; /* Rojo */
+    color: #ffffff !important;
+}
+
+.bg-riesgo-muy-alto {
+    background-color: #8b0000 !important; /* Rojo oscuro / Carmesí */
+    color: #ffffff !important;
+}
+
+/* ==========================================================================
+   BOTÓN PRINCIPAL AZUL IICA
+   ========================================================================== */
+.btn-iica-azul {
+    background-color: var(--iica-azul) !important;
+    color: #ffffff !important;
+    border: none !important;
+    transition: all 0.3s ease;
+}
+
+.btn-iica-azul:hover {
+    background-color: #002244 !important; /* Azul ligeramente más oscuro al pasar el cursor */
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 51, 102, 0.35) !important;
+}
+
+.btn-iica-azul:active {
+    transform: translateY(0);
+}
+
+/* ==========================================================================
+   ESTILOS DE TARJETAS DE BRECHA Y PRIORIDAD (PASO A PASO)
+   ========================================================================== */
+
+/* Muy Alta: Rojo Oscuro */
+.card-brecha-muy-alta {
+    background-color: #f8d7da !important;
+    color: #842029 !important;
+    border: 1px solid #f5c2c7 !important;
+}
+
+/* Alta: Rojo */
+.card-brecha-alta {
+    background-color: #fbe7e9 !important;
+    color: #dc3545 !important;
+    border: 1px solid #f8b4b8 !important;
+}
+
+/* Media: Naranja */
+.card-brecha-media {
+    background-color: #ffe5d0 !important;
+    color: #d97706 !important;
+    border: 1px solid #fcd34d !important;
+}
+
+/* Baja: Amarillo */
+.card-brecha-baja {
+    background-color: #fef9c3 !important;
+    color: #a16207 !important;
+    border: 1px solid #fde047 !important;
+}
+
+/* Nula: Verde */
+.card-brecha-nula {
+    background-color: #d1e7dd !important;
+    color: #0f5132 !important;
+    border: 1px solid #badbcc !important;
+}
+
+/* Encabezado de Tablas Azul IICA */
+.thead-iica-azul,
+.thead-iica-azul th {
+    background-color: var(--iica-azul, #003366) !important;
+    color: #ffffff !important;
+}
+
+/* Tarjeta de Tipo de Intervención (Gris claro + Borde sutil) */
+#boxTipoIntervencion,
+.card-tipo-intervencion {
+    background-color: #e3e7eb !important; 
+    border: 1px solid #adb5bd !important; 
+}
