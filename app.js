@@ -815,12 +815,12 @@ function calcularYMostrarDashboard(payload) {
         listaRiesgos.forEach(r => {
             const fila = document.createElement('tr');
             fila.innerHTML = `
-                <td class="text-start ps-3 fw-bold text-secondary">${r.tipologia}</td>
+                <td class="text-start">${r.tipologia}</td>
                 <td class="text-start">${r.nombre}</td>
                 <td><span class="badge bg-light text-dark border">${r.prob}</span></td>
                 <td><span class="badge bg-light text-dark border">${r.imp}</span></td>
-                <td class="fw-bold text-danger">${r.irp.toFixed(2)}</td>
-                <td class="pe-3"><span class="badge px-3 py-1 ${r.nivel.clase}">${r.nivel.texto}</span></td>
+                <td class="fw-bold text-dark pe-3">${r.irp.toFixed(2)}</td>
+                <td class="fw-bold text-dark pe-3"><span class="badge px-3 py-1 ${r.nivel.clase}">${r.nivel.texto}</span></td>
             `;
             cuerpoTablaRiesgos.appendChild(fila);
         });
@@ -867,11 +867,11 @@ function calcularYMostrarDashboard(payload) {
         listaCapacidades.forEach(c => {
             const fila = document.createElement('tr');
             fila.innerHTML = `
-                <td class="text-start ps-3 fw-bold text-secondary">${c.tipo}</td>
-                <td class="text-start fw-bold">${c.nombre}</td>
+                <td class="text-start">${c.tipo}</td>
+                <td class="text-start">${c.nombre}</td>
                 <td><span class="badge bg-light text-dark border">${c.valor}</span></td>
                 <td><span class="badge px-3 py-1 ${c.evaluacion.clase} w-100">${c.evaluacion.texto}</span></td>
-                <td class="fw-bold text-danger pe-3">${c.ice.toFixed(2)}</td>
+                <td class="fw-bold text-dark pe-3">${c.ice.toFixed(2)}</td>
             `;
             cuerpoTablaCapacidades.appendChild(fila);
         });
@@ -942,4 +942,213 @@ function generarDashboardResultados() {
 
     // 5. Enviar los datos empaquetados a la función que dibuja el Dashboard
     calcularYMostrarDashboard(payloadCompleto);
+}
+
+// ==============================================================================
+// FUNCIÓN AUXILIAR PARA CARGAR EL LOGO INSTITUCIONAL
+// ==============================================================================
+function cargarImagenLocal(url) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null); 
+        img.src = url;
+    });
+}
+
+// ==============================================================================
+// FUNCIÓN DE GENERACIÓN DE PDF (REGISTRO COMPLETO SIN FILTROS)
+// ==============================================================================
+async function generarPDF() {
+    if (!payloadActual) {
+        alert("Por favor, calcule el Dashboard antes de generar el informe en PDF.");
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const ahora = new Date();
+    const fechaStr = ahora.toLocaleDateString('es-ES') + " " + ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
+    // ---------------------------------------------------------
+    // 1. CARGAR Y DIBUJAR ENCABEZADO CON LOGO
+    // ---------------------------------------------------------
+    const logoImg = await cargarImagenLocal('logo-iica.png');
+    
+    if (logoImg) {
+        doc.addImage(logoImg, 'PNG', 168, 16, 25, 10);
+    }
+
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(0, 51, 102); // Azul IICA
+    doc.text("Informe final: Medición de la brecha entre riesgo y capacidad", 14, 20);
+
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(100, 100, 100);
+    doc.text("Marco de Evaluación de la Resiliencia Agroalimentaria (MERA)", 14, 26);
+    doc.text(`Fecha de generación: ${fechaStr}`, 14, 32);
+
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.5);
+    doc.line(14, 36, 196, 36);
+
+    // ---------------------------------------------------------
+    // 2. PREPARAR DATOS: TODAS LAS PERTURBACIONES
+    // ---------------------------------------------------------
+    let cuerpoRiesgos = [];
+    const riesgos = payloadActual.paso1_riesgos || {};
+
+    for (const key in riesgos) {
+        const prob = Number(riesgos[key].probabilidad);
+        const imp = Number(riesgos[key].impacto);
+        
+        // Entra si el usuario respondió la pregunta (sin importar si es alto o bajo)
+        if (prob > 0 && imp > 0) {
+            const irp = (prob * imp) / 9.0;
+            const tipologia = DICCIONARIO_TIPOLOGIAS[key] || "General";
+            const nombre = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+            
+            let nivelTexto = "Bajo";
+            if (irp >= 0.6) nivelTexto = "Alto";
+            else if (irp >= 0.3) nivelTexto = "Medio"; 
+
+            cuerpoRiesgos.push([tipologia, nombre, prob, imp, irp.toFixed(2), nivelTexto]);
+        }
+    }
+    cuerpoRiesgos.sort((a, b) => b[4] - a[4]);
+
+    // ---------------------------------------------------------
+    // 3. PREPARAR DATOS: TODAS LAS CAPACIDADES
+    // ---------------------------------------------------------
+    let cuerpoCapacidades = [];
+    const capacidades = payloadActual.paso2_capacidades || {};
+
+    for (const key in capacidades) {
+        const valor = Number(capacidades[key]);
+        
+        // Entra si el usuario respondió la pregunta
+        if (valor > 0) {
+            const ice = valor / 5.0;
+            const capacidadGeneral = typeof obtenerNombreCapacidadGeneral === 'function' ? obtenerNombreCapacidadGeneral(key) : "Capacidad";
+            const nombreIndicador = NOMBRES_INDICADORES[key] || key.toUpperCase();
+            
+            // Calculamos el texto de evaluación básico si no existe la función
+            let observacion = "Evaluado";
+            if (valor >= 4) observacion = "Fuerte";
+            else if (valor === 3) observacion = "Moderada";
+            else if (valor <= 2) observacion = "Vulnerable";
+
+            if (typeof obtenerDetalleCapacidadExcel === 'function') {
+                observacion = obtenerDetalleCapacidadExcel(valor).texto;
+            }
+
+            cuerpoCapacidades.push([capacidadGeneral, nombreIndicador, valor, observacion, ice.toFixed(2)]);
+        }
+    }
+    cuerpoCapacidades.sort((a, b) => a[4] - b[4]);
+
+    // ---------------------------------------------------------
+    // 4. PREPARAR DATOS: TODAS LAS BRECHAS
+    // ---------------------------------------------------------
+    let cuerpoBrechas = [];
+    for (const keyRiesgo in riesgos) {
+        const prob = Number(riesgos[keyRiesgo].probabilidad);
+        const imp = Number(riesgos[keyRiesgo].impacto);
+        
+        if (prob > 0 && imp > 0) {
+            const irp = (prob * imp) / 9.0;
+            for (const keyCap in capacidades) {
+                const valCap = Number(capacidades[keyCap]);
+                
+                if (valCap > 0) {
+                    const ice = valCap / 5.0;
+                    const brecha = Math.max(0, irp - ice);
+                    
+                    // Sin filtros: Registramos todas las combinaciones
+                    const nomR = keyRiesgo.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+                    const nomC = NOMBRES_INDICADORES[keyCap] || keyCap.toUpperCase();
+                    
+                    let prioridad = "SIN PRIORIDAD";
+                    let tipo = "MANTENIMIENTO";
+
+                    if (brecha >= 0.60) {
+                        prioridad = "CRÍTICA";
+                        tipo = "ABSORCIÓN";
+                    } else if (brecha >= 0.40) {
+                        prioridad = "ALTA";
+                        tipo = "ADAPTACIÓN";
+                    } else if (brecha >= 0.20) {
+                        prioridad = "MEDIA";
+                        tipo = "ADAPTACIÓN";
+                    } else if (brecha > 0) {
+                        prioridad = "BAJA";
+                        tipo = "TRANSFORMACIÓN/MANTENIMIENTO";
+                    }
+
+                    cuerpoBrechas.push([nomR, nomC, brecha.toFixed(2), prioridad, tipo]);
+                }
+            }
+        }
+    }
+    cuerpoBrechas.sort((a, b) => b[2] - a[2]);
+
+    // ---------------------------------------------------------
+    // 5. DIBUJAR TABLAS
+    // ---------------------------------------------------------
+    let posicionY = 44;
+
+    // --- TABLA 1 ---
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(0, 51, 102);
+    doc.text("1. Resumen de perturbaciones registradas", 14, posicionY);
+
+    doc.autoTable({
+        startY: posicionY + 3,
+        head: [['Tipología', 'Perturbación', 'Probabilidad', 'Impacto', 'IRP', 'Nivel de Riesgo']],
+        body: cuerpoRiesgos.length > 0 ? cuerpoRiesgos : [['-', 'No hay datos registrados', '-', '-', '-', '-']],
+        theme: 'grid',
+        headStyles: { fillColor: [0, 51, 102], textColor: 255, fontStyle: 'bold', halign: 'center' },
+        styles: { fontSize: 8.5, halign: 'center', cellPadding: 2 },
+        columnStyles: { 0: { halign: 'left' }, 1: { halign: 'left' } }
+    });
+
+    posicionY = doc.lastAutoTable.finalY + 12;
+
+    // --- TABLA 2 ---
+    doc.text("2. Resumen de capacidades evaluadas", 14, posicionY);
+
+    doc.autoTable({
+        startY: posicionY + 3,
+        head: [['Capacidad', 'Indicador', 'Valor (1-5)', 'Capacidad Observada', 'Índice de Capacidad Efectiva (ICE)']],
+        body: cuerpoCapacidades.length > 0 ? cuerpoCapacidades : [['-', 'No hay datos registrados', '-', '-', '-']],
+        theme: 'grid',
+        headStyles: { fillColor: [0, 51, 102], textColor: 255, fontStyle: 'bold', halign: 'center' },
+        styles: { fontSize: 8.5, halign: 'center', cellPadding: 2 },
+        columnStyles: { 0: { halign: 'left' }, 1: { halign: 'left' } }
+    });
+
+    posicionY = doc.lastAutoTable.finalY + 12;
+    if (posicionY > 220) { doc.addPage(); posicionY = 20; }
+
+    // --- TABLA 3 (AHORA EN AZUL IICA) ---
+    doc.setTextColor(0, 51, 102); // Cambiado de rojo a Azul IICA
+    doc.text("3. Cruce estratégico: Todas las brechas identificadas", 14, posicionY);
+
+    doc.autoTable({
+        startY: posicionY + 3,
+        head: [['Perturbación (Riesgo)', 'Indicador (Capacidad)', 'Brecha', 'Prioridad', 'Tipo de Intervención']],
+        body: cuerpoBrechas.length > 0 ? cuerpoBrechas : [['-', 'No hay datos registrados', '-', '-', '-']],
+        theme: 'grid',
+        headStyles: { fillColor: [0, 51, 102], textColor: 255, fontStyle: 'bold', halign: 'center' },
+        styles: { fontSize: 8.5, halign: 'center', cellPadding: 2 },
+        columnStyles: { 0: { halign: 'left' }, 1: { halign: 'left' } }
+    });
+
+    // ---------------------------------------------------------
+    // 6. DESCARGA
+    // ---------------------------------------------------------
+    doc.save(`Informe_MERA_IICA_${ahora.toISOString().slice(0,10)}.pdf`);
 }
