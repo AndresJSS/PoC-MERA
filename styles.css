@@ -64,9 +64,7 @@ body {
    ========================================================================== */
 .tarjeta-seccion {
     /* Mantiene el borde gris claro general */
-    border: 1px solid #e0e0e0; 
-    /* Crea la banda lateral azul IICA más gruesa */
-    border-left: 5px solid var(--iica-azul) !important; 
+    border: 1px solid #e0e0e0;  
     /* Suaviza un poco las esquinas */
     border-radius: 0.5rem; 
 }
@@ -370,4 +368,59 @@ html {
 .card-tipo-intervencion {
     background-color: #e3e7eb !important; 
     border: 1px solid #adb5bd !important; 
+}
+
+/* =========================================
+   ESTILOS DINÁMICOS PARA TARJETAS DE CAPACIDADES (FORZADOS)
+   ========================================= */
+
+/* 1. ABSORCIÓN (Azul IICA) */
+.btn-absorcion .tipologia-card {
+    border: 2px solid #003366 !important;
+    background-color: #adbffc !important;
+    transition: all 0.3s ease-in-out;
+}
+.btn-absorcion .tipologia-card span {
+    color: #003366 !important;
+    transition: all 0.3s ease-in-out;
+}
+.btn-absorcion.active .tipologia-card {
+    background-color: #003366 !important;
+}
+.btn-absorcion.active .tipologia-card span {
+    color: #ffffff !important;
+}
+
+/* 2. ADAPTACIÓN (Verde IICA) */
+.btn-adaptacion .tipologia-card {
+    border: 2px solid #00994C !important;
+    background-color: #cefcce !important;
+    transition: all 0.3s ease-in-out;
+}
+.btn-adaptacion .tipologia-card span {
+    color: #00994C !important;
+    transition: all 0.3s ease-in-out;
+}
+.btn-adaptacion.active .tipologia-card {
+    background-color: #00994C !important;
+}
+.btn-adaptacion.active .tipologia-card span {
+    color: #ffffff !important;
+}
+
+/* 3. TRANSFORMACIÓN (Naranja Institucional) */
+.btn-transformacion .tipologia-card {
+    border: 2px solid #E67817 !important;
+    background-color: #ffc89b !important;
+    transition: all 0.3s ease-in-out;
+}
+.btn-transformacion .tipologia-card span {
+    color: #E67817 !important;
+    transition: all 0.3s ease-in-out;
+}
+.btn-transformacion.active .tipologia-card {
+    background-color: #E67817 !important;
+}
+.btn-transformacion.active .tipologia-card span {
+    color: #ffffff !important;
 }
